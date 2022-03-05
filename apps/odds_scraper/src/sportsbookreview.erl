@@ -24,6 +24,12 @@ reload2() ->
     %os:cmd("sh ../../../../get_odds.sh"),
     {ok, F} = file:read_file("../../../../sportsbookreview"),
     {match,  [_|TableEnds0]} =  re:run(F, "   \\[\\d+\\][^\n]+\n   Opener", [global, {capture, all}]),
+    {match, Dates1} = re:run(F, "   Opener\n   [^\n]+\n", [global, {capture, all, binary}]),
+    Dates = lists:map(fun(T) ->
+                              T2 = re:replace(T, "   Opener\n   ", ""),
+                              iolist_to_binary(T2)
+                      end, Dates1),
+
     TableEnds = lists:map(fun([{X, _}]) -> X end, TableEnds0),
     Tables = cut_tables(TableEnds, F),
     Titles = 
@@ -37,7 +43,7 @@ reload2() ->
         lists:map(
           fun(X) ->
                   {match, L} = re:run(X, "[^\n]+\n   \\[\\d+\\][^\n]+\n[^\n]+\n   \\(BUTTON\\) Options\n((?=(?!eventLink))[\\w\\W])*", [global, {capture, all, binary}]),
-                  lists:map(
+                  L2 = lists:map(
                     fun([Game|_]) ->
                             Game2a = iolist_to_binary(re:replace(Game, "\n\n", "\n", [global])),
                             {match, Game2b} = re:run(Game2a, "((?=(?!18.. Gamble Responsibly))[\\w\\W])*", [{capture, all, binary}]),
@@ -50,15 +56,16 @@ reload2() ->
                             Game7 = iolist_to_binary(re:replace(Game6, ", \\]$", "", [global]))
                             
                             %binary:split(Game4, <<"\n">>, [global])
-                    end, L)
+                    end, L),
+                  iolist_to_binary(L2)
                               %G1 = binary:split(X, <<"   00\n   00\n">>, [global]),
                           %lists:map(fun(X) ->
                               %re:run(X, "   \d\d\d\n   \d\d\d\n", [global, {capture, all, binary}])
                   %end, G1)
           end, Tables),
-    lists:zipwith(fun(T, Gs) ->
-                          {T, Gs}
-                  end, Titles, Games).
+    lists:zipwith3(fun(T, Gs, D) ->
+                          {T, Gs, D}
+                  end, Titles, Games, Dates).
     %Games.
 
 split(Loc, Binary) ->

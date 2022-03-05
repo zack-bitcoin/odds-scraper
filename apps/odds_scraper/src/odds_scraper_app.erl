@@ -12,6 +12,7 @@
 start(_StartType, _StartArgs) ->
     inets:start(),
     start_http(),
+    %cron:doit(0),
     odds_scraper_sup:start_link().
 
 stop(_State) ->
