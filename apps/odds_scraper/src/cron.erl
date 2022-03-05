@@ -9,6 +9,7 @@
 
 reload() ->
     os:cmd("sh ../../../../get_odds.sh"),
+    timer:sleep(3000),
     sportsbookreview:reload().
     %io:fwrite("reload").
 

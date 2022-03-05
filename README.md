@@ -1,6 +1,9 @@
 Odds Scraper
 =======
 
+You need lynx installed to use this software.
+Tested in Ubuntu 20.04
+
 `sh get_odds.sh` loading the web page to a local file.
 
 `sh start.sh` to turn on the server.
@@ -24,3 +27,4 @@ using the api
 when you load the data from the api, all the words are base64 encoded.
 you can base64 decode in javascript like this:
 `Decoded = atob(Encoded);`
+
