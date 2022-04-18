@@ -2,7 +2,7 @@
 
 -export([init/2, init/3, handle/2, terminate/3, doit/1]).
 
-%curl -i -d '[-6,"test"]' http://localhost:8084
+%curl -i -d '[-6,"test", 1]' http://localhost:8084
 
 init(Req, State) ->
 	  handle(Req, State).
@@ -19,4 +19,13 @@ handle(Req, State) ->
 init(_Type, Req, _Opts) -> {ok, Req, no_state}.
 terminate(_Reason, _Req, _State) -> ok.
 doit({test, 1}) ->
-    sportsbookreview:read().
+    LoT = sportsbookreview:read(),%list of tuples
+    LoL = lists:map(fun(X) ->
+                            tuple_to_list(X)
+                    end, LoT),
+    Lo1 = lists:foldl(fun(A, B) ->
+                              A ++ B
+                      end, [], LoL),
+    {ok, Lo1}.
+    
+    

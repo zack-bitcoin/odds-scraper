@@ -17,9 +17,9 @@
     //page.innerHTML = "<h1>Success.<h1>";
     const response = await apost(["test", 1]);
 
-    console.log(response);
-    console.log(atob(response[1]));
-    console.log(atob(response[2]));
-    console.log(atob(response[3]));
+    console.log(JSON.stringify(response));
+    //console.log(atob(response[1]));
+    //console.log(atob(response[2]));
+    //console.log(atob(response[3]));
     
 })();
