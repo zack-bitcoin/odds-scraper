@@ -70,7 +70,7 @@ reload2() ->
                             Game5 = iolist_to_binary(re:replace(Game4, "\n$", "", [global])),
                             Game6 = iolist_to_binary(re:replace(Game5, "\n", ", ", [global])),
                             Game7 = iolist_to_binary(re:replace(Game6, ", \\]$", "", [global])),
-                            Game8 = iolist_to_binary(re:replace(Game7, ", \\(\\d+\\)", "", [global])),
+                            Game8 = iolist_to_binary(re:replace(Game7, " \\(\\d+\\)", "", [global])),
                             Game9 = iolist_to_binary(re:replace(Game8, ", \\[ \\]", "", [global])),
                             Game10 = iolist_to_binary(re:replace(Game9, ", Final", "", [global])),
                             Game11 = iolist_to_binary(re:replace(Game10, ", 00", "", [global])),

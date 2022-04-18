@@ -8,10 +8,10 @@
 
 
 reload() ->
-    os:cmd("sh ../../../../get_odds.sh"),
+    io:fwrite("reload"),
+    os:cmd("sh ../../../../get_odds2.sh > ../../../../sportsbookreview"),
     timer:sleep(3000),
     sportsbookreview:reload().
-    %io:fwrite("reload").
 
 talk(X) ->
     talker:talk(X, {{127,0,0,1}, 8081}).
