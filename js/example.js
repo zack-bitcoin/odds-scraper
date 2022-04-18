@@ -16,11 +16,13 @@
 
     //page.innerHTML = "<h1>Success.<h1>";
     const response = await apost(["test", 1]);
+    console.log(JSON.stringify(response.slice(1).map(function(x){return(atob(x))})));
+
     var response2 = response.slice(1);
-    console.log(JSON.stringify(response2));
+    //console.log(JSON.stringify(response2));
     var r2 = response2.map(function(x){
         return(atob(x))});
-    console.log(JSON.stringify(r2));
+    //console.log(JSON.stringify(r2));
     //console.log(atob(response[1]));
     //console.log(atob(response[2]));
     //console.log(atob(response[3]));
