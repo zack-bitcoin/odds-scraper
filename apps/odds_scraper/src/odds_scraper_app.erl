@@ -23,14 +23,14 @@ start_http() ->
     Dispatch =
         cowboy_router:compile(
           [{'_', [
-		  %{"/:file", file_handler, []}%,
+		  {"/:file", file_handler, []},%,
 		  %{"/[...]", file_handler, []}%,
 		  {"/", http_handler, []}
 		 ]}]),
     %{ok, Port} = application:get_env(amoveo_mining_pool, port),
-    Port = 8091,
+    Port = 8084,
     {ok, _} = cowboy:start_clear(http,
-				 [{ip, {0,0,0,0}}, {port, 8084}],
+				 [{ip, {0,0,0,0}}, {port, Port}],
 				 #{env => #{dispatch => Dispatch}}),
     ok.
     

@@ -1,5 +1,5 @@
 -module(cron).
--export([doit/1]).
+-export([doit/1, reload/0]).
 
 %We want to re-download from the website every time the full node finds a new block. and re-generage the JSON.
 

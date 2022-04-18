@@ -39,11 +39,27 @@ reload2() ->
                           L3 = re:replace(L2, "   \\[\\d+\\]", ""),
                           iolist_to_binary(L3)
                   end, Tables),
+    %io:fwrite("before tables\n"),
+    %io:fwrite(Tables),
+    %io:fwrite("\n"),
+    %io:fwrite("after tables \n"),
     Games = 
         lists:map(
           fun(X) ->
-                  {match, L} = re:run(X, "[^\n]+\n   \\[\\d+\\][^\n]+\n[^\n]+\n   \\(BUTTON\\) Options\n((?=(?!eventLink))[\\w\\W])*", [global, {capture, all, binary}]),
-                  L2 = lists:map(
+                  %case re:run(X, "[^\n]+\n   \\[\\d+\\][^\n]+\n[^\n]+\n   \\(BUTTON\\) Options\n((?=(?!eventLink))[\\w\\W])*", [global, {capture, all, binary}]) of
+                  case re:run(X, "[^\n]+\n   (\\(\\d+\\) )?\\[\\d+\\][^\n]+\n[^\n]+\n   \\(BUTTON\\) Options\n((?=(?!eventLink))[\\w\\W])*", [global, {capture, all, binary}]) of
+                  %case re:run(X, "[^\n]+\n   \\[\\d+\\][^\n]+\n([^\n]+\n)?   \\(BUTTON\\) Options\n", [global, {capture, all, binary}]) of
+                      nomatch ->
+                          io:fwrite("nomatch\n"),
+                          io:fwrite(X),
+                          io:fwrite("no match end\n"),
+                          io:fwrite("\n"),
+                          <<>>;
+                      {match, L} ->
+                          %{match, L} = 
+                          %re:run(X, "[^\n]+\n   \\[\\d+\\][^\n]+\n[^\n]+\n   \\(BUTTON\\) Options\n((?=(?!eventLink))[\\w\\W])*", [global, {capture, all, binary}]),
+                          %re:run(X, "[^\n]+\n   \\[\\d+\\][^\n]+\n[^\n]+\n   \\(BUTTON\\) Options\n", [global, {capture, all, binary}]),
+                          L2 = lists:map(
                     fun([Game|_]) ->
                             Game2a = iolist_to_binary(re:replace(Game, "\n\n", "\n", [global])),
                             {match, Game2b} = re:run(Game2a, "((?=(?!18.. Gamble Responsibly))[\\w\\W])*", [{capture, all, binary}]),
@@ -53,11 +69,21 @@ reload2() ->
                             Game4 = iolist_to_binary(re:replace(Game3, "\\(BUTTON\\) Options\n", "", [global])),
                             Game5 = iolist_to_binary(re:replace(Game4, "\n$", "", [global])),
                             Game6 = iolist_to_binary(re:replace(Game5, "\n", ", ", [global])),
-                            Game7 = iolist_to_binary(re:replace(Game6, ", \\]$", "", [global]))
+                            Game7 = iolist_to_binary(re:replace(Game6, ", \\]$", "", [global])),
+                            Game8 = iolist_to_binary(re:replace(Game7, ", \\(\\d+\\)", "", [global])),
+                            Game9 = iolist_to_binary(re:replace(Game8, ", \\[ \\]", "", [global])),
+                            Game10 = iolist_to_binary(re:replace(Game9, ", Final", "", [global])),
+                            Game11 = iolist_to_binary(re:replace(Game10, ", 00", "", [global])),
+                            Game12 = iolist_to_binary(re:replace(Game11, " -, Time", "", [global])),
+                            %io:fwrite("round \n"),
+                            %io:fwrite(iolist_to_binary(Game7)),
+                            %io:fwrite("\n"),
+                            [Game12, "; "]
                             
                             %binary:split(Game4, <<"\n">>, [global])
                     end, L),
-                  iolist_to_binary(L2)
+                          iolist_to_binary(L2)
+                  end
                               %G1 = binary:split(X, <<"   00\n   00\n">>, [global]),
                           %lists:map(fun(X) ->
                               %re:run(X, "   \d\d\d\n   \d\d\d\n", [global, {capture, all, binary}])
