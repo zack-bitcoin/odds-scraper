@@ -10,6 +10,8 @@ Tested in Ubuntu 20.04
 
 `sh attach.sh` to connect to the server's REPL.
 
+hold the control key and click the D key to disconnect from the REPL.
+
 
 While connected to REPL you can issue these commands
 ================
