@@ -8,8 +8,8 @@ start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
 terminate(_, _) -> io:format("died!"), ok.
 handle_info(_, X) -> {noreply, X}.
-handle_cast(reload, _) -> 
-    {noreply, reload2()};
+handle_cast(reload, X) -> 
+    {noreply, reload2(X)};
 handle_cast(_, X) -> {noreply, X}.
 handle_call(read, _From, X) -> 
     {reply, X, X};
@@ -20,48 +20,47 @@ reload() ->
 read() ->
     gen_server:call(?MODULE, read).
 
-reload2() ->
+reload2(DB) ->
     %os:cmd("sh ../../../../get_odds.sh"),
     {ok, F} = file:read_file("../../../../sportsbookreview"),
-    {match,  [_|TableEnds0]} =  re:run(F, "   \\[\\d+\\][^\n]+\n   Opener", [global, {capture, all}]),
-    {match, Dates1} = re:run(F, "   Opener\n   [^\n]+\n", [global, {capture, all, binary}]),
-    Dates = lists:map(fun(T) ->
-                              T2 = re:replace(T, "   Opener\n   ", ""),
-                              iolist_to_binary(T2)
-                      end, Dates1),
-
-    TableEnds = lists:map(fun([{X, _}]) -> X end, TableEnds0),
-    Tables = cut_tables(TableEnds, F),
-    Titles = 
-        lists:map(fun(X) ->
-                          {match, [[L]]} = re:run(X, "   \\[\\d+\\][^\n]+\n   Opener", [global, {capture, all, binary}]),
-                          L2 = re:replace(L, "\n   Opener", ""),
-                          L3 = re:replace(L2, "   \\[\\d+\\]", ""),
-                          iolist_to_binary(L3)
-                  end, Tables),
-    %io:fwrite("before tables\n"),
-    %io:fwrite(Tables),
-    %io:fwrite("\n"),
-    %io:fwrite("after tables \n"),
+    case F of
+        <<"Server Error", _/binary>> ->
+            DB;
+        _ ->
+            {match,  [_|TableEnds0]} =  re:run(F, "   \\[\\d+\\][^\n]+\n   Opener", [global, {capture, all}]),
+            {match, Dates1} = re:run(F, "   Opener\n   [^\n]+\n", [global, {capture, all, binary}]),
+            Dates = lists:map(fun(T) ->
+                                      T2 = re:replace(T, "   Opener\n   ", ""),
+                                      iolist_to_binary(T2)
+                              end, Dates1),
+            
+            TableEnds = lists:map(fun([{X, _}]) -> X end, TableEnds0),
+            Tables = cut_tables(TableEnds, F),
+            Titles = 
+                lists:map(fun(X) ->
+                                  {match, [[L]]} = re:run(X, "   \\[\\d+\\][^\n]+\n   Opener", [global, {capture, all, binary}]),
+                                  L2 = re:replace(L, "\n   Opener", ""),
+                                  L3 = re:replace(L2, "   \\[\\d+\\]", ""),
+                                  iolist_to_binary(L3)
+                          end, Tables),
+                 %io:fwrite("before tables\n"),
+                 %io:fwrite(Tables),
+                 %io:fwrite("\n"),
+                 %io:fwrite("after tables \n"),
     Games = 
         lists:map(
           fun(X) ->
-                  %case re:run(X, "[^\n]+\n   \\[\\d+\\][^\n]+\n[^\n]+\n   \\(BUTTON\\) Options\n((?=(?!eventLink))[\\w\\W])*", [global, {capture, all, binary}]) of
                   case re:run(X, "[^\n]+\n   (\\(\\d+\\) )?\\[\\d+\\][^\n]+\n[^\n]+\n   \\(BUTTON\\) Options\n((?=(?!eventLink))[\\w\\W])*", [global, {capture, all, binary}]) of
-                  %case re:run(X, "[^\n]+\n   \\[\\d+\\][^\n]+\n([^\n]+\n)?   \\(BUTTON\\) Options\n", [global, {capture, all, binary}]) of
                       nomatch ->
                           io:fwrite("nomatch\n"),
                           io:fwrite(X),
                           io:fwrite("no match end\n"),
                           io:fwrite("\n"),
-                          <<>>;
+                          DB;
                       {match, L} ->
-                          %{match, L} = 
-                          %re:run(X, "[^\n]+\n   \\[\\d+\\][^\n]+\n[^\n]+\n   \\(BUTTON\\) Options\n((?=(?!eventLink))[\\w\\W])*", [global, {capture, all, binary}]),
-                          %re:run(X, "[^\n]+\n   \\[\\d+\\][^\n]+\n[^\n]+\n   \\(BUTTON\\) Options\n", [global, {capture, all, binary}]),
                           L2 = lists:map(
-                    fun([Game|_]) ->
-                            Game2a = iolist_to_binary(re:replace(Game, "\n\n", "\n", [global])),
+                                 fun([Game|_]) ->
+                                         Game2a = iolist_to_binary(re:replace(Game, "\n\n", "\n", [global])),
                             {match, Game2b} = re:run(Game2a, "((?=(?!18.. Gamble Responsibly))[\\w\\W])*", [{capture, all, binary}]),
                             Game2c = iolist_to_binary(Game2b),
                             Game2 = iolist_to_binary(re:replace(Game2c, "   ", "", [global])),
@@ -84,14 +83,15 @@ reload2() ->
                     end, L),
                           iolist_to_binary(L2)
                   end
-                              %G1 = binary:split(X, <<"   00\n   00\n">>, [global]),
-                          %lists:map(fun(X) ->
-                              %re:run(X, "   \d\d\d\n   \d\d\d\n", [global, {capture, all, binary}])
-                  %end, G1)
           end, Tables),
-    lists:zipwith3(fun(T, Gs, D) ->
+            Result = 
+                lists:zipwith3(
+                  fun(T, Gs, D) ->
                           {T, Gs, D}
-                  end, Titles, Games, Dates).
+                  end, Titles, Games, Dates),
+            %{NowA, NowB, NowC} = erlang:now(),
+            Result ++ [erlang:now()]
+    end.
     %Games.
 
 split(Loc, Binary) ->
