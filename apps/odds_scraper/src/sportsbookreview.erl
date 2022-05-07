@@ -50,7 +50,7 @@ reload2(DB) ->
     Games = 
         lists:map(
           fun(X) ->
-                  case re:run(X, "[^\n]+\n   (\\(\\d+\\) )?\\[\\d+\\][^\n]+\n[^\n]+\n   \\(BUTTON\\) Options\n((?=(?!eventLink))[\\w\\W])*", [global, {capture, all, binary}]) of
+                  case re:run(X, "[^\n]+\n   (\\(\\d+\\) )?\\[\\d+\\][^\n]+\n([^\n]+\n)?   \\(BUTTON\\) Options\n((?=(?!eventLink))[\\w\\W])*", [global, {capture, all, binary}]) of
                       nomatch ->
                           io:fwrite("nomatch\n"),
                           io:fwrite(X),
