@@ -19,6 +19,7 @@ handle(Req, State) ->
 init(_Type, Req, _Opts) -> {ok, Req, no_state}.
 terminate(_Reason, _Req, _State) -> ok.
 doit({test, 1}) ->
+    %reverse order.
     LoT = sportsbookreview:read(),%list of tuples
     LoL = lists:map(fun(X) ->
                             tuple_to_list(X)
@@ -26,6 +27,25 @@ doit({test, 1}) ->
     Lo1 = lists:foldl(fun(A, B) ->
                               A ++ B
                       end, [], LoL),
-    {ok, Lo1}.
+    {ok, Lo1};
+doit({test, 2}) ->
+    %good order
+    LoT = sportsbookreview:read(),%list of tuples
+    LoL = lists:map(fun(X) ->
+                            tuple_to_list(X)
+                    end, LoT),
+    Lo1 = lists:foldl(fun(A, B) ->
+                              B ++ A
+                      end, [], LoL),
+    {ok, Lo1};
+doit({test, 3}) ->
+    %sublists for each sport.
+    LoT = sportsbookreview:read(),%list of tuples
+    LoL = lists:map(fun(X) ->
+                            tuple_to_list(X)
+                    end, LoT),
+    {ok, LoL}.
+
+
     
     

@@ -15,8 +15,14 @@
     var page = document.getElementById("page");
 
     //page.innerHTML = "<h1>Success.<h1>";
-    const response = await apost(["test", 1]);
-    const result = response.slice(1).map(function(x){return(atob(x))});
+    const response = await apost(["test", 3]);
+    const result = response.slice(1).map(
+        function(x){
+            return(x.slice(1).map(
+                function(y){
+                    return(atob(y))
+                }));
+        });
     console.log(JSON.stringify(result));
     //console.log(JSON.stringify(response.slice(1).map(function(x){return(atob(x))})));
 
